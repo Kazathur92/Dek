@@ -2,13 +2,15 @@ import React, { Component } from "react"
 import "./Login.css"
 import { Link } from "react-router-dom"
 import brain from "../loginAssets/brain.png"
+import UsersManager from "../../modules/UsersManager"
 
 
 export default class Login extends Component {
     // Set initial state
     state = {
         email: "",
-        username: ""
+        username: "",
+        authenticated: false
     }
 
     // Update state whenever an input field is edited
@@ -22,50 +24,71 @@ export default class Login extends Component {
     handleLogin = (e) => {
         e.preventDefault()
 
-    //    Setting username in session storage. Grabbing the username from session 
-    //storage and searching through "users" in the datatbase. The .find attempts to find 
-    //a username that matches the username in session storage. If able to find a match, 
+    //    Setting username in session storage. Grabbing the username from session
+    //storage and searching through "users" in the datatbase. The .find attempts to find
+    //a username that matches the username in session storage. If able to find a match,
     //log in under that user. If not, display message that username not found.
 
-        sessionStorage.setItem(
-            "username",
-            this.state.username)
-console.log(this.state.username)
-        let currentUser = sessionStorage.getItem("username")
-        //we get the current user from the session storage.
-        console.log(this.props.users)
-        console.log(this.state)
-        let authenticated = this.props.users.find(user =>   //The find() method returns the value of the first element in the array that satisfies the provided testing function. Otherwise undefined is returned.
-            user.name === this.state.username )
-            console.log(currentUser)
-            console.log(this.props.users)
 
-            console.log(authenticated)
-// authenticated is not getting the updated props. thats why is throwing an arror.and it's also undefined.
-            // sessionStorage.setItem(
-            //     "userId",
-            //     authenticated.id)
+        UsersManager.checkUser(this.state.email, this.state.username).then((response) => {
+              if (response.length > 0) {
+                  console.log("RESPONOSE:", response)
+                sessionStorage.setItem("userId", response[0].id);
+                sessionStorage.setItem("userName", response[0].name);
+              }
+            })
+            .then(() => {
+                if (sessionStorage.userName) {
+                    console.log("IT FOUND A USER NAME")
+                    this.setState({ authenticated: true })
+                    console.log(this.state.authenticated)
+                    console.log("ITS CHANGING STATE")
 
-            if (authenticated === undefined){
-                alert("Please re-renter a valid username and email or sign up below!")
-        //if the user is not registered direct them to the registeration page.        
-                this.props.history.push("/register")
-            } else {
-                sessionStorage.setItem(
-                    "userId",
-                    authenticated.id)
-
-                          // UPDATING THE COMPONENT WITHOUT REFRESHING THE PAGE
-                         this.props.updateComponent()
-                         // Taking user to idea page
-                         this.props.history.push("/idea")
-                        
+                } else {
+                    alert("incorrect username or password!")
+                    this.props.history.push("/register")
+                }
+                })
+                .then(() => {
+                    if (this.state.authenticated) {
+                            console.log("ITS PASSING")
+                            this.props.updateComponent()
+                            this.props.history.push("/idea")
+                    } else {
+                        console.log("woops")
                     }
+                })
 
 
-            
+
+        // sessionStorage.setItem("username",this.state.username)
+
+        // let currentUser = sessionStorage.getItem("username")
+        // //we get the current user from the session storage.
+
+        // let authenticated = this.props.usersList.find(user =>   //The find() method returns the value of the first element in the array that satisfies the provided testing function. Otherwise undefined is returned.
+        //     user.name === this.state.username )
+
+
+        //     if (authenticated === undefined){
+        //         alert("Please re-renter a valid username and email or sign up below!")
+        // //if the user is not registered direct them to the registeration page.
+        //         this.props.history.push("/register")
+        //     } else {
+        //         sessionStorage.setItem("userId",authenticated.id)
+
+        //                   // UPDATING THE COMPONENT WITHOUT REFRESHING THE PAGE
+        //                  this.props.updateComponent()
+        //                  // Taking user to idea page
+        //                  this.props.history.push("/idea")
+
+        //             }
+
+
+
 
     }
+
     //if the username is not equal to null remove everything in the session storage.
    componentDidMount() {
        if(sessionStorage.getItem("username") !== null){
@@ -75,7 +98,10 @@ console.log(this.state.username)
        }
    }
 
-    
+   consoleLog = () => {
+       console.log("authenticated State: ", this.state.authenticated)
+   }
+
     render()
     {
 
@@ -83,7 +109,8 @@ console.log(this.state.username)
         return (
              //The onSubmit handler of the form is used to execute the class method
             <section className="login">
-                <form className="registerContainer" onSubmit={this.handleLogin}>   
+                <button onClick={this.consoleLog}>CONSOLE LOG</button>
+                <form className="registerContainer" onSubmit={this.handleLogin}>
                 <img src={brain} className="acornIcon" alt="acornIcon" height="60" width="60"></img>
                     <h2>Please sign in</h2>
                     <label htmlFor="inputUsername">

@@ -5,8 +5,11 @@ import BestForm from './bestForm';
 import BetterForm from './BetterForm';
 import "./Idea.css"
 import NavBar from "../nav/NavBar"
-export class Idea extends Component {
 
+
+
+
+export class Idea extends Component {
 
 
   // here is my parent component that holds all the other child components.
@@ -14,15 +17,16 @@ export class Idea extends Component {
 
     return (
       <React.Fragment>
-      <NavBar />
+      <NavBar clearStorage={this.props.clearStorage}/>
       <div className =" dek">
         <IdeaForm addIdea={this.props.addIdea}
           history={this.props.history} /> {/*history is a JavaScript library that lets you easily manage session history anywhere JavaScript runs.*/}
-        
+
         <IdeaList okIdea={this.props.okIdea}
           deleteOkIdea={this.props.deleteOkIdea}
-          forwardComponent1={this.props.forwardComponent1} 
-          sessionId= {this.props.sessionId}/>
+          forwardComponent1={this.props.forwardComponent1}
+          sessionId= {this.props.sessionId}
+          sendNewSessionId={this.props.sendNewSessionId}/>
         <BetterForm betterIdea={this.props.betterIdea}
           deleteBetterIdea={this.props.deleteBetterIdea}
           forwardComponent2={this.props.forwardComponent2} />
@@ -33,7 +37,7 @@ export class Idea extends Component {
       </React.Fragment>
     )
   }
-  
+
 }
 
 export default Idea

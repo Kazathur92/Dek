@@ -9,12 +9,12 @@ export default class IdeaForm extends Component {
         idea: "",
         userId: "",
         categoryId: 1,
-    
+        value: "woop"
 
     }
     // clear the input field whenever we submit.
     clearField = ()=> {
-        
+
         this.setState({idea: ""})
 
     }
@@ -24,10 +24,10 @@ export default class IdeaForm extends Component {
         const stateToChange = {}
         stateToChange[evt.target.id] = evt.target.value
         this.setState(stateToChange)
-       
+
     }
-    
-   
+
+
 
     /*
         Local method for validation, creating idea object, and
@@ -44,27 +44,29 @@ export default class IdeaForm extends Component {
             userId: Number(sessionUser)
         }
 
+        console.log("IDEA: ", idea)
+
         this.props.addIdea(idea)
         .then(() => this.props.history.push("/idea"))
         .then (()=> this.clearField())
 
     }
-    
+
 
     render() {
         return (
-           
+
 
                 <Box
                 gridArea="header"
                 direction="column"
                 align="start"
-                
+
                 pad={{ horizontal: "medium", vertical: "small" }}
                 background="dark-3"
                 className="ideaForm1" >
-              
-                   
+
+
                         <label htmlFor="IdeaName">What do you have in your mind?</label>
                         <Input type="textarea" required
                             key="form-control"
@@ -74,7 +76,7 @@ export default class IdeaForm extends Component {
                             id="idea"
                             placeholder="anything"
                         />
-                        <Clock type="digital" run = "forward" size= "xlarge"  margin= "small" hourLimit= "12" 
+                        <Clock type="digital" run = "forward" size= "xlarge"  margin= "small" hourLimit= "12"
                         alignSelf = "center"/>
 
                     <Button type="submit"  onClick={this.constructNewIdea} color="success">Add Idea</Button>
@@ -83,7 +85,7 @@ export default class IdeaForm extends Component {
 
 
 
-           
+
         )
     }
 }

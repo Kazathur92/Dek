@@ -9,5 +9,11 @@ export default {
   },
   getUserSpecific(sessionId){
     return fetch(`${remoteURL}/users/${sessionId}`).then(e => e.json());
+  },
+
+
+checkUser(email, name) {
+
+    return fetch(`http://localhost:5002/users?email=${email}&name=${name}`).then(e => e.json())
   }
 }

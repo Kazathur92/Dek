@@ -14,61 +14,82 @@ import Idea from "./idea/Idea"
 
 
 export default class ApplicationViews extends Component {
-    isAuthenticated = () => sessionStorage.getItem("username") !== null
-    //if the username is not empty 
+    isAuthenticated = () => sessionStorage.getItem("userName") !== null
+    //if the username is not empty
     state = {
         okIdea: [],
         betterIdea: [],
         bestIdea: [],
-        users: [],
-        sessionId: sessionStorage.getItem("userId")
-
+        usersList: [],
+        sessionId: ""
     };
+
+    // This is being triggered in NavBar
+    clearStorage = () => {
+        sessionStorage.clear()
+        this.setState({ sessionId: ""})
+    }
+
+    // This is being triggered in ideaList
+    sendNewSessionId = (newSessionId) => {
+        this.setState({
+            sessionId: +newSessionId
+        })
+    }
+
+
     componentDidMount() {
-        let sessionId = sessionStorage.getItem("userId")
-        IdeaManager.getOkIdeas(sessionId)
+
+
+
+        // IdeaManager.getBetterIdeas(sessionId)
+        // .then(better => {
+        //     this.setState({
+        //         betterIdea: better
+        //     })
+        // })
+
+        // IdeaManager.getBestIdeas(sessionId)
+        // .then(best => {
+        //     this.setState({
+        //         bestIdea: best
+        //     })
+        // })
+        // .then(() => {this.updateComponent()}) // i callled this function to load the users before i pass it to the login
+
+            // this.addUser()
+            // commented out to keep new user from being added on
+
+            const newState = {}
+    //updating the new state.
+
+    // console.log(sessionId)
+            // fetch(`http://localhost:5002/idea?userId=${sessionId}`)
+            //     .then(r => r.json())
+            //     .then(r => {
+            //         // console.log(r)
+            //         newState.idea = r
+            //         // console.log(newState)
+            //         this.setState(newState)
+
+            //     })
+        }
+
+        componentDidUpdate = () => {
+            IdeaManager.getOkIdeas(+this.state.sessionId)
             .then(okIdeas => {
                 this.setState({
                     okIdea: okIdeas
                 })
             })
-
-        IdeaManager.getBetterIdeas(sessionId)
-            .then(better => {
-                this.setState({
-                    betterIdea: better
-                })
-            })
-
-        IdeaManager.getBestIdeas(sessionId)
-            .then(best => {
-                this.setState({
-                    bestIdea: best
-                })
-            })
-          
-            this.updateComponent() // i callled this function to load the users before i pass it to the login
-            // this.addUser()
-            // commented out to keep new user from being added on
-            
-            const newState = {}
-    //updating the new state.
-    
-    console.log(sessionId)
-            fetch(`http://localhost:5002/idea?userId=${sessionId}`)
-                .then(r => r.json())
-                .then(r => {
-                    console.log(r)
-                    newState.idea = r
-                    console.log(newState)
-                    this.setState(newState)
-    
-                })
         }
+
+
+
         addUser = (user) => SignUpManager.post(user)
         .then(() => UsersManager.getAll())
         .then(Allusers => this.setState({
-            users: Allusers             //added this three line of codes today to set the new user.
+            usersList: Allusers             //added this three line of codes today to set the new user.
         }))
 
     addIdea = (idea) => IdeaManager.post(idea)
@@ -79,21 +100,34 @@ export default class ApplicationViews extends Component {
 
         })
         );
-   
+
 //??
     deleteOkIdea = id => {
-        let sessionId = sessionStorage.getItem("userId")
+
         return fetch(`http://localhost:5002/idea/${id}`, {
             method: "DELETE"
         })
-            .then(e => e.json())
-            .then(() => fetch(`http://localhost:5002/idea?categoryId=1&${sessionId}`))
-            .then(e => e.json())
-            .then(idea => this.setState({
-                okIdea: idea,
+        .then(() => { IdeaManager.getOkIdeas(this.state.sessionId)
+            .then(okIdeas => {
+                this.setState({
+                    okIdea: okIdeas
+                })
+                console.log("UPDATE STATE")
+            })
+        })
 
-            }))
+
+        // NOT NESCESARY was somehow messing things up
+            // .then(e => e.json())
+            // .then(() => fetch(`http://localhost:5002/idea?categoryId=1&${sessionId}`))
+            // .then(e => e.json())
+            // .then(idea => this.setState({
+            //     okIdea: idea,
+
+            // }))
     }
+
+
     deleteBetterIdea = id => {
         return fetch(`http://localhost:5002/idea/${id}`, {
             method: "DELETE"
@@ -167,26 +201,33 @@ export default class ApplicationViews extends Component {
     updateComponent = () => {
         const sessionId = sessionStorage.getItem("userId");
         const currentUserId = Number(sessionId);
-        this.setState({users: currentUserId})
+        this.setState({usersList: currentUserId})
         UsersManager.getAll(this.state.sessionId).then(allUsers => {
-            this.setState({ users: allUsers });
-            console.log(allUsers)
+            this.setState({ usersList: allUsers });
+            // console.log(allUsers)
         })
         IdeaManager.getAll(this.state.sessionId)
             .then(allIdea => {
-                this.setState({     //the method setstate stores the result in the local component state by using React 
+                this.setState({     //the method setstate stores the result in the local component state by using React
                     idea: allIdea
                 })
             })
     }
 
+    consoleLogMain = () => {
+        console.log("SESSION ID: ", this.state.sessionId)
+        // console.log("NEW SESSION ID: ", this.state.newSessionId)
+        console.log("OK IDEAS: ", this.state.okIdea)
+        console.log("USERS: ", this.state.users)
+    }
+
     render() {
         return (
             <React.Fragment>
-
+                <button onClick={this.consoleLogMain}>CONSOLE LOG MAIN</button>
                 <Route path="/login" render={(props) => {
                     return <Login {...props}
-                        users={this.state.users}
+                        usersList={this.state.usersList}
                         updateComponent={this.updateComponent} />
                 }} />
                 <Route path="/register" render={(props) => {
@@ -196,7 +237,7 @@ export default class ApplicationViews extends Component {
                 <Route
                     exact
                     path="/idea" render={props => {
-                        if (this.isAuthenticated()) {   // added that line so u we cant change the route manually.   
+                        if (this.isAuthenticated()) {   // added that line so u we cant change the route manually.
                         return <Idea {...props}
                             okIdea={this.state.okIdea}
                             addIdea={this.addIdea}
@@ -208,6 +249,8 @@ export default class ApplicationViews extends Component {
                             forwardComponent1={this.forwardComponent1}
                             forwardComponent2={this.forwardComponent2}
                             sessionId= {this.state.sessionId}
+                            clearStorage={this.clearStorage}
+                            sendNewSessionId={this.sendNewSessionId}
                         />
                     } else{
                         return <Redirect to= "/login" />;
@@ -221,10 +264,10 @@ export default class ApplicationViews extends Component {
                             idea={this.state.idea}
 
                         />
-                    
-                    
+
+
                 }} />
-                
+
             </React.Fragment>
         )
     }

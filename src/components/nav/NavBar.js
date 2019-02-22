@@ -7,6 +7,10 @@ import { Navbar} from 'reactstrap'
 
 
 class NavBar extends Component {
+
+
+
+
     render() {
         return (
             <Navbar color="dark" light expand="md">
@@ -14,9 +18,9 @@ class NavBar extends Component {
                     <li className="nav-item">
                         <Link className="nav-link" to="/idea">Home</Link>
                     </li>
-                   
+
                     <li className="nav-item">
-                        <Link className="nav-link" to="/login">/ Log out</Link>
+                        <Link className="nav-link" to="/login" onClick={this.props.clearStorage}>/ Log out</Link>
                     </li>
                 </ul>
             </Navbar>

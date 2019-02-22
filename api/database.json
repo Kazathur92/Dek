@@ -29,6 +29,27 @@
       "categoryId": 1,
       "userId": 2,
       "id": 15
+    },
+    {
+      "idea": "pokemon",
+      "categoryId": 1,
+      "value": "woop",
+      "userId": 4,
+      "id": 16
+    },
+    {
+      "idea": "woop",
+      "categoryId": 1,
+      "value": "woop",
+      "userId": 4,
+      "id": 18
+    },
+    {
+      "idea": "pokemon 3",
+      "categoryId": 1,
+      "value": "woop",
+      "userId": 1,
+      "id": 25
     }
   ],
   "categories": [
@@ -60,6 +81,11 @@
       "name": "test1",
       "email": "test1@email.com",
       "id": 3
+    },
+    {
+      "name": "kazathur",
+      "email": "gabmin21@hotmail.com",
+      "id": 4
     }
   ]
 }
